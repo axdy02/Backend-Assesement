@@ -24,3 +24,19 @@ All prompts sent to the AI assistant, appended after each phase.
 - `GET /rest/employees` — EMP blocked (403), RM sees own reports, APE sees EMP+RM, CFO sees all
 - `POST /rest/employees/assign` — CFO-only; validates empId is EMP and rmId is RM
 - `DELETE /rest/employees/assign` — CFO-only; validates pair is actually linked before unlinking
+
+---
+
+### Phase 3 — 2026-06-24
+
+**Prompt:**
+> Start Phase 3
+
+**Built:**
+- `POST /rest/reimbursements` — EMP-only; validates title required, amount > 0
+- `PATCH /rest/reimbursements/:id` — RM/APE/CFO dispatch:
+  - RM: scope-checked (own reports only), rm_status must be PENDING
+  - APE: rm_status must be APPROVED, ape_status must be PENDING; records ape_id
+  - CFO: ape_status must be APPROVED, cfo_status must be PENDING
+  - Double-acting prevented at all stages
+- `deriveEmpStatus(r)` — single named function for EMP-facing status derivation

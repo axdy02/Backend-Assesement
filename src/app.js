@@ -5,9 +5,10 @@ const express      = require('express');
 const cookieParser = require('cookie-parser');
 const { AppError } = require('./utils/errors');
 
-const authRoutes      = require('./modules/auth/auth.routes');
-const rolesRoutes     = require('./modules/roles/roles.routes');
-const employeesRoutes = require('./modules/employees/employees.routes');
+const authRoutes             = require('./modules/auth/auth.routes');
+const rolesRoutes            = require('./modules/roles/roles.routes');
+const employeesRoutes        = require('./modules/employees/employees.routes');
+const reimbursementsRoutes   = require('./modules/reimbursements/reimbursements.routes');
 
 const app = express();
 
@@ -18,9 +19,10 @@ app.use(express.json());
 app.use(cookieParser(process.env.SESSION_SECRET));
 
 // ── Routes ─────────────────────────────────────────────────────────────
-app.use('/rest/onboardings', authRoutes);
-app.use('/rest/roles',       rolesRoutes);
-app.use('/rest/employees',   employeesRoutes);
+app.use('/rest/onboardings',     authRoutes);
+app.use('/rest/roles',           rolesRoutes);
+app.use('/rest/employees',       employeesRoutes);
+app.use('/rest/reimbursements',  reimbursementsRoutes);
 
 // ── 404 handler (no route matched) ────────────────────────────────────
 app.use((req, res) => {
