@@ -7,7 +7,15 @@ const controller   = require('./reimbursements.controller');
 
 const router = Router();
 
-// POST — EMP only creates a claim
+// GET /rest/reimbursements — role-scoped list (all authenticated roles)
+router.get(
+  '/',
+  authenticate,
+  authorize(['EMP', 'RM', 'APE', 'CFO']),
+  controller.listReimbursements
+);
+
+// POST /rest/reimbursements — EMP raises a claim
 router.post(
   '/',
   authenticate,
@@ -15,7 +23,17 @@ router.post(
   controller.createReimbursement
 );
 
-// PATCH — RM / APE / CFO act on a claim at their own stage
+// GET /rest/reimbursements/:userId — RM views a subordinate's full claim history
+// Must come before PATCH /:id so Express doesn't confuse the param name.
+// Both are parametric but differ by HTTP method, so no ambiguity at runtime.
+router.get(
+  '/:userId',
+  authenticate,
+  authorize(['RM']),
+  controller.listByUser
+);
+
+// PATCH /rest/reimbursements/:id — RM/APE/CFO act on a claim
 router.patch(
   '/:id',
   authenticate,
@@ -24,3 +42,4 @@ router.patch(
 );
 
 module.exports = router;
+

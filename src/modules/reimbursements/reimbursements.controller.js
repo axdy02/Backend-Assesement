@@ -42,4 +42,35 @@ const patchReimbursement = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'Reimbursement updated successfully', reimbursement });
 });
 
-module.exports = { createReimbursement, patchReimbursement };
+/**
+ * GET /rest/reimbursements
+ * Role-scoped list:
+ *   EMP  → own claims (with derived status)
+ *   RM   → pending-at-RM claims from own reports
+ *   APE  → rm-approved, ape-pending claims
+ *   CFO  → ape-approved claims
+ * Empty list returns { reimbursements: [] }, never null or 404.
+ */
+const listReimbursements = asyncHandler(async (req, res) => {
+  const reimbursements = await reimbursementsService.listReimbursements(req.user);
+  res.status(200).json({ reimbursements });
+});
+
+/**
+ * GET /rest/reimbursements/:userId
+ * Returns a specific EMP's reimbursement history.
+ * Only accessible if the target EMP reports directly to the requester (RM).
+ */
+const listByUser = asyncHandler(async (req, res) => {
+  const targetUserId = Number(req.params.userId);
+
+  if (isNaN(targetUserId) || targetUserId <= 0) {
+    return res.status(400).json({ error: 'Invalid user id' });
+  }
+
+  const reimbursements = await reimbursementsService.listByUser(targetUserId, req.user);
+  res.status(200).json({ reimbursements });
+});
+
+module.exports = { createReimbursement, patchReimbursement, listReimbursements, listByUser };
+

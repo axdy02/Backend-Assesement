@@ -193,4 +193,77 @@ async function patchReimbursement(reimbursementId, action, requester) {
   }
 }
 
-module.exports = { createReimbursement, patchReimbursement, deriveEmpStatus };
+// ─────────────────────────────────────────────────────────────────────────────
+// GET — role-scoped list and per-user list
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Return the reimbursements list visible to the requesting user's role.
+ *
+ * EMP  → own claims with derived status field added
+ * RM   → pending-at-RM claims from own reports
+ * APE  → rm-approved, ape-pending claims
+ * CFO  → ape-approved claims
+ *
+ * Empty results always return an array, never null.
+ */
+async function listReimbursements(requester) {
+  switch (requester.role) {
+    case 'EMP': {
+      const rows = await repo.listForEmp(requester.id);
+      // Attach derived status for EMP — single source of truth via deriveEmpStatus
+      return rows.map((r) => ({ ...r, status: deriveEmpStatus(r) }));
+    }
+    case 'RM':
+      return repo.listForRm(requester.id);
+    case 'APE':
+      return repo.listForApe();
+    case 'CFO':
+      return repo.listForCfo();
+    default:
+      throw new ForbiddenError('Unknown role');
+  }
+}
+
+/**
+ * List all reimbursements for a specific employee, accessible to their manager.
+ *
+ * Rules:
+ * - targetUserId must exist.
+ * - Target must have role EMP.
+ * - Target must report to the requester (manager_id = requester.id).
+ *   Only RMs have direct reports, so this naturally restricts the endpoint to RMs.
+ *
+ * Returns reimbursements with derived status attached (EMP's perspective).
+ */
+async function listByUser(targetUserId, requester) {
+  const target = await repo.findUserById(targetUserId);
+
+  if (!target) {
+    throw new NotFoundError(`User ${targetUserId} does not exist`);
+  }
+
+  if (target.role !== 'EMP') {
+    throw new ValidationError(
+      `User ${targetUserId} is not an EMP — only EMP reimbursements can be viewed this way`
+    );
+  }
+
+  if (target.manager_id !== requester.id) {
+    throw new ForbiddenError(
+      'You can only view reimbursements for employees who report directly to you'
+    );
+  }
+
+  const rows = await repo.listByEmpId(targetUserId);
+  return rows.map((r) => ({ ...r, status: deriveEmpStatus(r) }));
+}
+
+module.exports = {
+  createReimbursement,
+  patchReimbursement,
+  deriveEmpStatus,
+  listReimbursements,
+  listByUser,
+};
+
