@@ -10,3 +10,17 @@ All prompts sent to the AI assistant, appended after each phase.
 > READ prompt.md STRICTLY FOLLOW IT AND ASK ME IF YOU HAVE ANY DOUBTS. Start phase 1.
 
 **Approved plan:** Phase 1 implementation plan covering project scaffold, migrations for `users` and `reimbursements`, CFO seed, auth endpoints (register/login/logout), and `authenticate` middleware. Cookie strategy: plain signed cookie via `cookie-parser`.
+
+---
+
+### Phase 2 — 2026-06-24
+
+**Prompt:**
+> Start phase 2
+
+**Built:**
+- `authorize` middleware factory (role-list based, policy in route declarations)
+- `POST /rest/roles/assign` — CFO-only; validates userId exists and role is valid
+- `GET /rest/employees` — EMP blocked (403), RM sees own reports, APE sees EMP+RM, CFO sees all
+- `POST /rest/employees/assign` — CFO-only; validates empId is EMP and rmId is RM
+- `DELETE /rest/employees/assign` — CFO-only; validates pair is actually linked before unlinking
