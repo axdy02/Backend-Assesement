@@ -1,0 +1,12 @@
+## Prompt Log
+
+All prompts sent to the AI assistant, appended after each phase.
+
+---
+
+### Phase 1 — 2026-06-24
+
+**Session start prompt:**
+> READ prompt.md STRICTLY FOLLOW IT AND ASK ME IF YOU HAVE ANY DOUBTS. Start phase 1.
+
+**Approved plan:** Phase 1 implementation plan covering project scaffold, migrations for `users` and `reimbursements`, CFO seed, auth endpoints (register/login/logout), and `authenticate` middleware. Cookie strategy: plain signed cookie via `cookie-parser`.
