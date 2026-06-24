@@ -6,18 +6,13 @@ const { ValidationError, NotFoundError, ForbiddenError } = require('../../utils/
 /**
  * Return the employee list visible to the requesting user based on their role.
  *
- * EMP  → 403 (blocked entirely)
- * RM   → only their own direct reports (manager_id = req.user.id)
- * APE  → all EMPs and RMs
- * CFO  → everyone
+ * EMP is blocked entirely at the route layer via authorize(['RM','APE','CFO']).
+ * This service still returns an empty array rather than crashing for unknown roles.
  *
  * @param {object} requester - req.user
  */
 async function listEmployees(requester) {
   switch (requester.role) {
-    case 'EMP':
-      throw new ForbiddenError('Employees cannot list the employee directory');
-
     case 'RM':
       return repo.listByManager(requester.id);
 

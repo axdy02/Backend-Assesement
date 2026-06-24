@@ -40,3 +40,20 @@ All prompts sent to the AI assistant, appended after each phase.
   - CFO: ape_status must be APPROVED, cfo_status must be PENDING
   - Double-acting prevented at all stages
 - `deriveEmpStatus(r)` — single named function for EMP-facing status derivation
+
+---
+
+### Phase 4 — 2026-06-24
+
+**Prompt:**
+> start Phase 4
+
+**Built (Commit A — read side):**
+- `GET /rest/reimbursements` — EMP (own+derived status), RM (pending from reports), APE (rm-approved/ape-pending), CFO (ape-approved)
+- `GET /rest/reimbursements/:userId` — RM views subordinate's full claim history; guards: exists, is EMP, is direct report
+- Empty lists always return `{ reimbursements: [] }`, never null or 404
+
+**Built (Commit B — edge cases + README):**
+- Edge-case audit: all 15 items from spec §5 reviewed
+- EMP blocked on GET /employees at route layer (authorize middleware), not service
+- README: data model decisions, all assumptions documented, setup instructions

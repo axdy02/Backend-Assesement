@@ -8,7 +8,7 @@ const controller   = require('./employees.controller');
 const router = Router();
 
 // All three routes require authentication.
-// GET is open to RM / APE / CFO (EMP is blocked inside the service with 403).
+// GET blocks EMP via authorize middleware (403 before reaching the service).
 // POST and DELETE /assign are CFO-only.
 
 router.get(

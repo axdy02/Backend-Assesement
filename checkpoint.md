@@ -2,7 +2,10 @@
 
 | Tag | Commit | What works at this point |
 |---|---|---|
-| checkpoint-01 | _(fill after commit)_ | Phase 1 complete: scaffold, migrations, auth |
+| checkpoint-01 | 3924cbe | Phase 1 complete: scaffold, migrations, auth |
+| checkpoint-02 | 413f531 | Phase 2 complete: roles + employees RBAC |
+| checkpoint-03 | 57903d1 | Phase 3 complete: reimbursement write side |
+| checkpoint-04 | 35f4a57 | Phase 4a complete: reimbursement read side |
 
 ---
 
